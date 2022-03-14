@@ -1,24 +1,78 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { GameHost } from './components/GameHost';
+import { AppBar, createTheme, CssBaseline, Toolbar, Typography } from '@mui/material';
+import { makeStyles, ThemeProvider } from '@mui/styles';
+import Overlay from './components/Overlay';
 
+const useStyles = makeStyles(theme => ({
+  cards: {
+    position: 'relative',
+    left: 0,
+    top: 0,
+    zIndex: 20,
+  },
+  videoBase: {
+    position: 'relative',
+    left: 0,
+    top: 0,
+    zIndex: 10,
+  },
+  table: {
+    position: 'relative',
+    height: 'calc(100vh - 65px)',
+    overflow: 'hidden',
+  },
+  menuButton: {
+    marginRight: 2,
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
+const muiTheme = {
+  palette: {
+    type: "light",
+    primary: {
+      main: "#2194BB"
+    },
+    secondary: {
+      main: "#DAC338"
+    },
+    // text: {
+    //   main: "rgba(33,33,33,1)"
+    // },
+    success: {
+      main: "rgba(0,0,0,1)"
+    },
+    info: {
+      main: "rgba(0,0,0,1)"
+    },
+    warning: {
+      main: "rgba(0,0,0,1)"
+    },
+    bg: {
+      main: "#FFFFFF"
+    }
+  }
+};
 function App() {
+  const classes = useStyles();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App2">
+      <ThemeProvider theme={createTheme(muiTheme)} >
+
+
+        <CssBaseline />
+        <header className="App2-header">
+          {/* <img src={logo} className="App-logo" alt="logo" /> */}
+        
+
+        </header>
+          <GameHost></GameHost>
+      </ThemeProvider>
+
     </div>
   );
 }
