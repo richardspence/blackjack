@@ -1,259 +1,40 @@
 import { inherits } from "util";
 import { threadId } from "worker_threads";
+import { assert } from "../util/assert";
+import { FaceValue } from "./Card";
+import { Deck } from "./Deck";
+import { Hand, HandStatus } from "./Hand";
+import { Player } from "./Player";
 
 export interface GameRules {
     numDecks: number;
     lateSurrender: boolean;
     insurance: boolean;
     cut: number;
+    resplitAces: boolean;
 }
-export enum SuiteSymbol {
-    Spades = "♠️",
-    Clubs = "♣️",
-    Hearts = "♥️",
-    Diamonds = "♦️",
-}
+// export enum SuiteSymbol {
+//     Spades = "♠️",
+//     Clubs = "♣️",
+//     Hearts = "♥️",
+//     Diamonds = "♦️",
+// }
 
-export enum Suite {
-    Spades,
-    Clubs,
-    Hearts,
-    Diamonds,
-}
-
-export enum HandStatus {
-    Playing,
-    Blackjack,
-    TwentyOne,
-    Bust,
-    Stand,
-    Surrender,
-}
-
-export enum FaceValue {
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-    Nine,
-    Ten,
-    Jack,
-    Queen,
-    King,
-    Ace
-}
 
 const defaultRules: GameRules = {
     numDecks: 6,
     lateSurrender: true,
     insurance: false,
     cut: 1.5,
+    resplitAces: true,
 };
 
-export interface Card {
-    faceValue: FaceValue;
-    suite: Suite,
-
-}
-
-export interface HandCard {
-    card: Card,
-    score: number;
-    shown: boolean;
-}
-
-function assert(condition: any): asserts condition {
-    if (!condition) {
-        throw new Error('Asertion failed');
-    }
-}
-
-export class Hand {
-    surrender() {
-        assert(this.status === HandStatus.Playing);
-        this.status = HandStatus.Surrender;
-    }
-    public cards: HandCard[] = [];
-    public status: HandStatus;
-    public score: number;
-
-    constructor(private deck: Deck, public bet: number) {
-        this.status = HandStatus.Playing;
-        this.score = 0;
-    }
-
-    scoreCard(card: Card, acesHigh = true) {
-        let score;
-        switch (card.faceValue) {
-            case FaceValue.Ten:
-            case FaceValue.Jack:
-            case FaceValue.Queen:
-            case FaceValue.King:
-                score = 10;
-                break;
-            case FaceValue.Ace:
-                if (acesHigh) {
-                    score = 11;
-                } else {
-                    score = 1;
-                }
-                break;
-            default:
-                score = card.faceValue + 2;
-        }
-        return score;
-    }
-
-    hit(showCard = true) {
-        this.addCard(showCard);
-    }
-
-    stand() {
-        this.status = HandStatus.Stand;
-    }
-
-    doubleDown() {
-        this.bet *= 2;
-        this.hit();
-        if (this.status === HandStatus.Playing) {
-            this.stand();
-        }
-    }
-
-    private addCard(shown = true) {
-        assert(this.status === HandStatus.Playing);
-        const card = this.deck.pullCard();
-        const score = this.scoreCard(card);
-        this.cards.push({
-            card, score, shown
-        });
-        this.checkScore();
-    }
-
-    get isSoft() {
-        return this.cards.some(p => p.score === 11);
-    }
-
-    checkScore(): number {
-        const score = this.cards.reduce((l, p) => l + p.score, 0);
-        if (score > 21) {
-            if (this.isSoft) {
-                const aceHigh = this.cards.find(p => p.score === 11)!;
-                aceHigh.score = 1;
-                return this.checkScore();
-            }
-            this.status = HandStatus.Bust;
-        } else if (score === 21) {
-            if (this.cards.length === 2) {
-                this.status = HandStatus.Blackjack;
-            } else {
-                this.status = HandStatus.TwentyOne;
-            }
-        }
-        // set the score
-        this.score = score;
-        return score;
-    }
-}
-
-export class Player {
-    doubleDown() {
-        assert(this.hand);
-        this.chipsTotal -= this.hand!.bet;
-        this.hand?.doubleDown();
-    }
-    public hand?: Hand;
-
-    public chipsTotal: number;
-    constructor(private game: Game) {
-        this.chipsTotal = 1000;
-        this.hand = new Hand(this.game.deck, 0);
-
-    }
-    public play(bet: number) {
-        this.hand = new Hand(this.game.deck, bet);
-        this.chipsTotal -= bet;
-    }
-
-    public surrender() {
-        assert(this.hand);
-        this.hand!.surrender();
-    }
-
-    public settleBet(isPush = false) {
-        assert(this.hand);
-        let winnings = 0;
-        let totalReturn = 0;
-        const bet = this.hand.bet;
-        if (this.hand.status === HandStatus.Blackjack) {
-            winnings = bet * 1.5;
-            totalReturn = bet + winnings;
-        } else if (this.hand.status === HandStatus.Surrender) {
-            totalReturn = bet / 2;
-        } else if (!isPush) {
-            winnings = bet;
-            totalReturn = 2 * winnings;
-        } else {
-            // push
-            totalReturn = bet;
-        }
-
-        this.chipsTotal += totalReturn;
-
-        return { winnings, totalReturn };
-    }
-}
-
-export class Deck {
-
-    private _cards: Card[] = [];
-
-    constructor(private numDecks = 1) {
-    }
-
-    private init() {
-        for (let deckIndex = 0; deckIndex < this.numDecks; deckIndex++) {
-            for (let suiteIndex = 0; suiteIndex < 4; suiteIndex++) {
-                for (let cardIndex = 0; cardIndex <= FaceValue.Ace; cardIndex++) {
-                    this._cards.push({
-                        faceValue: cardIndex,
-                        suite: suiteIndex,
-                    });
-                }
-            }
-        }
-    }
-
-    public get cardsLeft() {
-        return this._cards.length;
-    }
-
-    public get decksLeft() {
-        return this.cardsLeft / 52;
-    }
 
 
-    public shuffle(init = true) {
-        if (init) {
-            this.init();
-        }
-        const shuffledCards: Card[] = [];
-        while (this._cards.length) {
-            const index = Math.floor(Math.random() * (this._cards.length));
-            const [card] = this._cards.splice(index, 1);
-            shuffledCards.push(card);
-        }
-        this._cards = shuffledCards;
-    }
 
-    public pullCard() {
-        return this._cards.shift()!;
-    }
 
-}
+
+
 
 export enum GameStatus {
     bet,
@@ -261,8 +42,28 @@ export enum GameStatus {
     end
 }
 
+export enum FinalStatus {
+    Lost,
+    Surrendered,
+    Tied,
+    Won,
+}
+
+export interface HandResults {
+    won: FinalStatus;
+    winnings: number;
+    totalReturn: number;
+    message: string;
+}
+
+export interface GameOptions {
+    preferSplit: boolean;
+    preferSoft: boolean;
+}
+
 export class Game {
     rules: GameRules;
+    options: Partial<GameOptions> = {};
     dealer: Hand;
     player!: Player;
     deck!: Deck;
@@ -274,20 +75,25 @@ export class Game {
     }
 
     get isPlaying() {
-        return this.player.hand?.status === HandStatus.Playing
-            && this.player.hand?.cards.length !== 0;
+        return this.player.isPlaying;
     }
 
     get canHit() {
-        return this.isPlaying;
+        return this.isPlaying && !this.player.hands.isSplitAces;
     }
 
     get canDouble() {
-        return this.isPlaying && this.player.hand?.cards.length === 2;
+        return this.isPlaying && this.player.primaryHand?.hasTwoCards
+            && !this.player.hands.isSplitAces;
     }
 
     get canSurrender() {
-        return this.isPlaying && this.player.hand?.cards.length === 2;
+        return this.isPlaying && this.player.primaryHand?.hasTwoCards
+            && !this.player.primaryHand.isSplit;
+    }
+
+    get canSplit() {
+        return this.isPlaying && this.player.hands.canSplit();
     }
 
     constructor(ruleSet: Partial<GameRules> = {}) {
@@ -313,13 +119,12 @@ export class Game {
     }
 
     start() {
-        assert(this.player.hand?.cards.length === 0);
+        assert(this.player.primaryHand?.cards.length === 0);
         this.dealer = new Hand(this.deck, 0);
         this.reshuffleIfRequired();
-        assert(this.player.hand);
-        this.player.hand.hit();
+        this.player.hit();
         this.dealer.hit();
-        this.player.hand.hit();
+        this.player.hit();
         this.dealer.hit(false);
 
         if (!this.rules.insurance || !this.isInsurance) {
@@ -342,18 +147,24 @@ export class Game {
 
     public lastMessage: string = '';
 
-    public lastResult?: { won: boolean, winnings: number; totalReturn: number };
+    public lastResult?: HandResults[];
 
     playDealer() {
-        const playerSurrender = this.player.hand?.status === HandStatus.Surrender;
-        const playerBust = this.player.hand?.status === HandStatus.Bust;
+        const playerSurrender = this.player.hands.hands.every(p => {
+            return p.status === HandStatus.Surrender;
+        });
+
         if (playerSurrender) {
             return;
         }
 
+        const dealerNeedsPlay = this.player.hands.hands.some(p => {
+            return p.status === HandStatus.Stand
+                || p.status === HandStatus.TwentyOne;
+        });
         this.dealer.cards[1].shown = true;
 
-        if (!playerBust) {
+        if (dealerNeedsPlay) {
             while (this.dealer.score < 17) {
                 this.dealer.hit();
             }
@@ -361,68 +172,82 @@ export class Game {
     }
 
     end() {
-        assert(this.player.hand);
         this.playDealer();
+        this.lastMessage = '';
+        const results = this.player.hands.hands.map((hand, i) => {
+            this.lastMessage += `\nHand ${i + 1}\n`;
+            return this.finalScoreHand(hand);
+        });
+
+
+        this.lastResult = results;
+        this.lastMessage += `\nReturn:${results.reduce((l, r) => l + r.totalReturn, 0)}`;
+    }
+
+    finalScoreHand(playerHand: Hand): HandResults {
         let result: {
-            won: boolean,
+            won: FinalStatus,
             winnings: number;
             totalReturn: number;
         } = {
-            won: false,
+            won: FinalStatus.Lost,
             winnings: 0,
             totalReturn: 0
         };
+        let message = '';
         if (this.dealer.status === HandStatus.Blackjack
-            && this.player.hand.status !== HandStatus.Blackjack) {
-            this.lastMessage = `Dealer blackjacked`;
-            this.player.hand.stand();
-        } else if (this.player.hand.status !== HandStatus.Surrender &&
-            this.player.hand.status !== HandStatus.Bust) {
-            if (this.player.hand.status === HandStatus.Blackjack
+            && playerHand.status !== HandStatus.Blackjack) {
+            message = `Dealer blackjacked`;
+            playerHand.stand();
+        } else if (playerHand.status !== HandStatus.Surrender &&
+            playerHand.status !== HandStatus.Bust) {
+            if (playerHand.status === HandStatus.Blackjack
                 && this.dealer.status !== HandStatus.Blackjack) {
-                this.lastMessage = 'Blackjack!';
+                message = 'Blackjack!';
                 result = {
                     ...this.player.settleBet(),
-                    won: true,
+                    won: FinalStatus.Won,
                 };
-            } else if (this.player.hand.score > this.dealer.score) {
+            } else if (playerHand.score > this.dealer.score) {
                 result = {
                     ...this.player.settleBet(),
-                    won: true,
+                    won: FinalStatus.Won,
                 };
-                this.lastMessage = `You won high score ${this.player.hand.score} vs ${this.dealer.score}`;
+                message = `You won high score ${playerHand.score} vs ${this.dealer.score}`;
             } else if (this.dealer.status === HandStatus.Bust) {
-                this.lastMessage = `Dealer busted ${this.dealer.score}`;
+                message = `Dealer busted ${this.dealer.score}`;
                 result = {
                     ...this.player.settleBet(),
-                    won: true,
+                    won: FinalStatus.Won,
                 };
-            } else if (this.dealer.status !== HandStatus.Blackjack) {
-                if (this.player.hand.score === this.dealer.score) {
+            } else {
+                if (playerHand.score === this.dealer.score) {
                     // push
-                    this.lastMessage = `Score tied with ${this.player.hand.score}`;
+                    message = `Score tied with ${playerHand.score}`;
                     result = {
                         ...this.player.settleBet(true),
-                        won: false,
+                        won: FinalStatus.Tied,
                     };
                 } else {
-                    this.lastMessage = `Dealer won with ${this.dealer.score}`;
+                    message = `Dealer won with ${this.dealer.score}`;
                 }
-
             }
 
-        } else if (this.player.hand.status === HandStatus.Surrender) {
-            this.lastMessage = `You surrendered`;
+        } else if (playerHand.status === HandStatus.Surrender) {
+            message = `You surrendered`;
             result = {
                 ...this.player.settleBet(),
-                won: false,
+                won: FinalStatus.Surrendered,
             };
-        } else if (this.player.hand.status === HandStatus.Bust) {
-            this.lastMessage = `You busted with ${this.player.hand.score}`;
+        } else if (playerHand.status === HandStatus.Bust) {
+            message = `You busted with ${playerHand.score}`;
         }
 
-        this.lastResult = result;
-        this.lastMessage += `\nReturn:${result.totalReturn}`;
+        this.lastMessage += `\n${message}`;
+        return {
+            ...result,
+            message
+        };
     }
 
 }

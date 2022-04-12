@@ -1,4 +1,4 @@
-import { Card, FaceValue, Suite } from "../blackjack/game";
+import { Card, FaceValue, Suite } from "../blackjack";
 
 export interface ICard {
     suit: UISuite;

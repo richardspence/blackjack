@@ -5,6 +5,8 @@ import { GameHost } from './components/GameHost';
 import { AppBar, createTheme, CssBaseline, Toolbar, Typography } from '@mui/material';
 import { makeStyles, ThemeProvider } from '@mui/styles';
 import Overlay from './components/Overlay';
+import { SnackbarProvider } from 'notistack';
+import { MainView } from './components/MainView';
 
 const useStyles = makeStyles(theme => ({
   cards: {
@@ -62,15 +64,16 @@ function App() {
   return (
     <div className="App2">
       <ThemeProvider theme={createTheme(muiTheme)} >
+        <SnackbarProvider maxSnack={10}>
+
+          <CssBaseline />
+          <header className="App2-header">
+            {/* <img src={logo} className="App-logo" alt="logo" /> */}
 
 
-        <CssBaseline />
-        <header className="App2-header">
-          {/* <img src={logo} className="App-logo" alt="logo" /> */}
-        
-
-        </header>
-          <GameHost></GameHost>
+          </header>
+         <MainView />
+        </SnackbarProvider>
       </ThemeProvider>
 
     </div>
