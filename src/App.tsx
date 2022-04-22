@@ -1,35 +1,35 @@
 import React from 'react';
 import './App.css';
 import { createTheme, CssBaseline } from '@mui/material';
-import { makeStyles, ThemeProvider } from '@mui/styles';
+import { ThemeProvider } from '@mui/styles';
 import { SnackbarProvider } from 'notistack';
 import { MainView } from './components/MainView';
 
-const useStyles = makeStyles(theme => ({
-  cards: {
-    position: 'relative',
-    left: 0,
-    top: 0,
-    zIndex: 20,
-  },
-  videoBase: {
-    position: 'relative',
-    left: 0,
-    top: 0,
-    zIndex: 10,
-  },
-  table: {
-    position: 'relative',
-    height: 'calc(100vh - 65px)',
-    overflow: 'hidden',
-  },
-  menuButton: {
-    marginRight: 2,
-  },
-  title: {
-    flexGrow: 1,
-  },
-}));
+// const useStyles = makeStyles(theme => ({
+//   cards: {
+//     position: 'relative',
+//     left: 0,
+//     top: 0,
+//     zIndex: 20,
+//   },
+//   videoBase: {
+//     position: 'relative',
+//     left: 0,
+//     top: 0,
+//     zIndex: 10,
+//   },
+//   table: {
+//     position: 'relative',
+//     height: 'calc(100vh - 65px)',
+//     overflow: 'hidden',
+//   },
+//   menuButton: {
+//     marginRight: 2,
+//   },
+//   title: {
+//     flexGrow: 1,
+//   },
+// }));
 const muiTheme = {
   palette: {
     type: "light",
