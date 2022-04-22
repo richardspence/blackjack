@@ -130,13 +130,13 @@ export class Strategy {
                     case FaceValue.Six:
                         return dealerValue <= FaceValue.Six;
                     case FaceValue.Four:
-                        return dealerValue == FaceValue.Six
-                            || dealerValue == FaceValue.Five;
+                        return dealerValue === FaceValue.Six
+                            || dealerValue === FaceValue.Five;
                     case FaceValue.Eight:
                     case FaceValue.Ace:
                         return true;
                     case FaceValue.Nine:
-                        return dealerValue != FaceValue.Seven
+                        return dealerValue !== FaceValue.Seven
                             && dealerValue < FaceValue.Ten;
 
                 }

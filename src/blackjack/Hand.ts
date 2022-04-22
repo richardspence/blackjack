@@ -1,6 +1,5 @@
 import { assert } from "../util/assert";
 import { Card, FaceValue } from "./Card";
-import { Deck } from "./Deck";
 
 export enum HandStatus {
     Playing,

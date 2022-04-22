@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Game, Hand, Player } from '../blackjack';
+import { Game, Hand } from '../blackjack';
 import { Odds } from '../blackjack/Odds';
 export interface OddsProps{
     game: Game;

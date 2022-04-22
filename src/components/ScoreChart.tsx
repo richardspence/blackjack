@@ -1,19 +1,18 @@
-import { Grid, Paper, styled, Tooltip } from '@mui/material';
+import { Paper, Tooltip } from '@mui/material';
 import * as React from 'react';
 import { FaceValue, Hand, IDeck, Suite } from '../blackjack';
 import { Deck } from '../blackjack/Deck';
 import { Odds } from '../blackjack/Odds';
-import { OddsView } from './OddsView';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 // import Tooltip from '@mui/material/Tooltip';
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
+// const Item = styled(Paper)(({ theme }) => ({
+//     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+//     ...theme.typography.body2,
+//     padding: theme.spacing(1),
+//     textAlign: 'center',
+//     color: theme.palette.text.secondary,
+// }));
 
 const scoreToHand = (score: number, deck: IDeck) => {
     const hand = new Hand(deck, 0);
@@ -33,8 +32,8 @@ const scoreToHand = (score: number, deck: IDeck) => {
     return hand;
 }
 
-interface ScoreChartProps {
-}
+// interface ScoreChartProps {
+// }
 
 const toPercent = (x: number)=>{
     return x.toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});

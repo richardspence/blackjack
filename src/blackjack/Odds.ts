@@ -1,5 +1,4 @@
-import { Face } from "@mui/icons-material";
-import { Hand, HandStatus, Suite } from ".";
+import { Hand, Suite } from ".";
 import { FaceValue } from "./Card";
 import { Deck } from "./Deck";
 import { MoveType } from "./Strategy";
@@ -199,7 +198,7 @@ export class Odds {
         // }
 
         if (node.hand.score < options.hitScoreMax
-            || node.hand.isSoft && options.hitSoft
+            || (node.hand.isSoft && options.hitSoft)
         ) {
             const scoreDiff = node.hand.isSoft ? 11 :
                 21 - node.hand.score;

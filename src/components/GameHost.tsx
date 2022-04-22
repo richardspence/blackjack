@@ -1,16 +1,12 @@
-import { Alert, AlertTitle, AppBar, Badge, Button, Divider, Grid, Icon, LinearProgress, Paper, Snackbar, ToggleButton, ToggleButtonGroup, Toolbar, Typography } from '@mui/material';
+import { Alert, AlertTitle, AppBar, Button, Divider, Grid, Paper, ToggleButton, ToggleButtonGroup, Toolbar, Typography } from '@mui/material';
 import * as React from 'react'
 import { useState } from 'react';
-import { FaceValue, FinalStatus, Game } from '../blackjack';
-import { toUiCard } from './CardHelpers';
-import CardSingle from './CardSingle';
-import Card from 'react-playing-card'
-import { AttachMoney, Close, Done, ArrowRightAlt, CompareArrows, DoubleArrow } from '@mui/icons-material';
+import { FinalStatus, Game } from '../blackjack';
+import { AttachMoney, ArrowRightAlt, CompareArrows, DoubleArrow } from '@mui/icons-material';
 import { LinearProgressWithLabel } from './LinearProgressWithLabel';
 import { HandControl } from './Card2';
 import { MoveType, Strategy } from '../blackjack/Strategy';
 import { useSnackbar } from 'notistack';
-import { Odds } from '../blackjack/Odds';
 import { OddsView } from './OddsView';
 import { StratView } from './StratView';
 
@@ -30,10 +26,10 @@ function checkStrategy(strategy: Strategy, moveType: MoveType) {
 }
 
 export const GameHost = () => {
-    const [game, setState] = useState(() => new Game());
+    const [game] = useState(() => new Game());
     const [actionId, increment] = useState(0);
     const [strategy] = useState(() => (new Strategy(game)));
-    const [hasResult, showResult] = useState(false);
+    const [, showResult] = useState(false);
     const [playerOption, setOptions] = useState('');
     const [viewOptions, setViewOptions] = useState<string[]>([]);
     const [lastStrat, setStrat] = useState<ReturnType<typeof checkStrategy>>(() => ({ success: true }));

@@ -1,10 +1,7 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { GameHost } from './components/GameHost';
-import { AppBar, createTheme, CssBaseline, Toolbar, Typography } from '@mui/material';
+import { createTheme, CssBaseline } from '@mui/material';
 import { makeStyles, ThemeProvider } from '@mui/styles';
-import Overlay from './components/Overlay';
 import { SnackbarProvider } from 'notistack';
 import { MainView } from './components/MainView';
 
@@ -60,7 +57,6 @@ const muiTheme = {
   }
 };
 function App() {
-  const classes = useStyles();
   return (
     <div className="App2">
       <ThemeProvider theme={createTheme(muiTheme)} >

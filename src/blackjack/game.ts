@@ -1,5 +1,3 @@
-import { inherits } from "util";
-import { threadId } from "worker_threads";
 import { assert } from "../util/assert";
 import { FaceValue } from "./Card";
 import { Deck } from "./Deck";

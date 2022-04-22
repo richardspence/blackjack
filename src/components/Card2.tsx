@@ -10,9 +10,9 @@ export interface CardProps {
 export const CardControl = (props: CardProps) => {
     if (props.shown) {
         const uiCard = toUiCard(props.card);
-        return <img src={`cards/${uiCard.rank}${uiCard.suit}.svg`} className="card" />
+        return <img src={`cards/${uiCard.rank}${uiCard.suit}.svg`} className="card" alt={`${uiCard.rank}${uiCard.suit}`} />
     } else {
-        return <img src="cards/BLUE_BACK.svg" className="card" />
+        return <img src="cards/BLUE_BACK.svg" className="card" alt='back' />
     }
 }
 

@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/384e309a-0d66-4970-afe8-2368afb053ab/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/rs-blackjack",
+    "appService.deploySubpath": "."
+}
