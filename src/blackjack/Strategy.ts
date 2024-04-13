@@ -8,7 +8,7 @@ export enum MoveType {
     Split,
     Surrender
 }
-
+ // https://wizardofodds.com/games/blackjack/strategy/calculator/
 
 export class Strategy {
 

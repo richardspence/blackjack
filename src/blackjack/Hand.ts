@@ -1,5 +1,6 @@
 import { assert } from "../util/assert";
 import { Card, FaceValue } from "./Card";
+import { Deck } from "./Deck";
 
 export enum HandStatus {
     Playing,
@@ -27,7 +28,9 @@ export class Hand {
     clone(): Hand {
         const hand =  new Hand(this.deck, this.bet);
 
-        hand.cards = [...this.cards];
+        hand.cards = [...this.cards.map(c=> ({
+            ...c,
+        }))];
         hand.status = this.status;
         hand.score = this.score;
 
